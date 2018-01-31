@@ -9,7 +9,6 @@ metadata:
     heritage: {{ .Release.Service }} 
 spec:
   type: {{ .Values.service.type }}
-  clusterIP: None
   ports:
   - name: headless
     port: 1883
