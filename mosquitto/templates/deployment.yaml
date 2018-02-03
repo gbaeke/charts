@@ -15,21 +15,31 @@ spec:
       labels:
         app: {{ template "fullname" . }}
         release: {{ .Release.Name }}
+      annotations:
+        checksum/config: {{ .Values.passwd | sha256sum }}
     spec:
       containers:
       - image: {{ .Values.image }}
         imagePullPolicy: {{ default "" .Values.imagePullPolicy | quote }}
         name: {{ template "fullname" . }}
         ports:
-        - containerPort: 1883
+        - containerPort: 8883
           name: "mqtt"
-        - containerPort: 9090
-          name: "websocket"
 
         volumeMounts:
+          - name: tls-ca
+            mountPath: /mosquitto/tls-ca
+            readOnly: true
+          - name: tls-server
+            mountPath: /mosquitto/tls-server
+            readOnly: true
           - name: mosquitto-conf
             mountPath: /mosquitto/config/mosquitto.conf
             subPath: mosquitto.conf
+            readOnly: true
+          - name: passwd
+            mountPath: /etc/mosquitto/passwd
+            subPath: passwd
             readOnly: true
           - name: mosquitto-data
             mountPath: /mosquitto/data
@@ -37,9 +47,18 @@ spec:
         resources:
 {{ toYaml .Values.resources | indent 10 }}
       volumes:
+      - name: tls-ca
+        secret:
+          secretName: {{ template "fullname" . }}-ca
+      - name: tls-server
+        secret:
+          secretName: {{ template "fullname" . }}-tls
       - name: mosquitto-conf
         configMap:
           name: {{ template "fullname" . }}
+      - name: passwd
+        configMap:
+          name: mqtt-passwd
       - name: mosquitto-data
       {{- if .Values.persistence.enabled }}
         persistentVolumeClaim:

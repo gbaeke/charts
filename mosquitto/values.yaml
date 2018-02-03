@@ -26,6 +26,12 @@ resources:
 
 config: |-
   log_dest stdout
-  listener 1883
-  listener 9090
-  protocol websockets
+  listener 8883
+  password_file /etc/mosquitto/passwd
+  allow_anonymous false
+  cafile /mosquitto/tls-ca/ca.crt
+  certfile /mosquitto/tls-server/tls.crt
+  keyfile /mosquitto/tls-server/tls.key
+
+passwd: |-
+  admin:$6$CugH57SaJ4bXB5Ui$jHWGbmIw1XmBCe9aIAbZHD7O45YeLbKOCAE4dTWz6LxT1yiek6CVcpMiJd3YUbVvfEo4ScpqT9JT60wLFN3vQA==

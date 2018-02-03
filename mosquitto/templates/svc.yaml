@@ -11,6 +11,6 @@ spec:
   type: {{ .Values.service.type }}
   ports:
   - name: headless
-    port: 1883
+    port: 8883
   selector:
     app: {{ template "fullname" . }}
